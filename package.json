@@ -1,0 +1,15 @@
+{
+  "name": "vjscc",
+  "private": true,
+  "packageManager": "pnpm@7.9.0",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {},
+  "devDependencies": {
+    "turbo": "^1.4.3"
+  },
+  "engines": {
+    "node": ">=16.14.0"
+  }
+}
