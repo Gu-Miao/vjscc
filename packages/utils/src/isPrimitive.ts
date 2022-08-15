@@ -1,0 +1,7 @@
+export { default as isUndefined } from 'lodash-es/isUndefined'
+export { default as isNull } from 'lodash-es/isNull'
+export { default as isString } from 'lodash-es/isString'
+export { default as isNumber } from 'lodash-es/isNumber'
+export { default as isArray } from 'lodash-es/isArray'
+export { default as isPlainObject } from 'lodash-es/isPlainObject'
+export { default as isFunction } from 'lodash-es/isFunction'

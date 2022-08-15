@@ -6,8 +6,8 @@ node_modules
 # testing
 coverage
 
-# next.js
-build
+# build
+dist
 
 # debug
 .pnpm-debug.log*
