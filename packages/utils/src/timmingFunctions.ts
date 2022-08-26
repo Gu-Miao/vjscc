@@ -1,5 +1,3 @@
-export type TimingFunction = (x: number) => number
-
 const { pow, sqrt, sin, cos, PI } = Math
 const c1 = 1.70158
 const c2 = c1 * 1.525
@@ -145,7 +143,7 @@ export function useTimingFunction(
   duration: number,
   startValue: number,
   targetValue: number,
-  fn: TimingFunction = linear
+  fn: (x: number) => number = linear
 ): number {
   const progress = currentTime / duration
   const diff = targetValue - startValue

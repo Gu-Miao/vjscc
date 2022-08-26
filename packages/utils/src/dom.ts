@@ -45,5 +45,5 @@ export function getElement(
   if (isHTMLElement(selector)) {
     return selector as HTMLElement
   }
-  return container.querySelector(selector)
+  return container.querySelector<HTMLElement>(selector)
 }
