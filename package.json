@@ -10,7 +10,8 @@
   },
   "scripts": {
     "start:modal": "turbo run start:modal",
-    "build": "turbo run build"
+    "build": "turbo run build",
+    "test": "turbo run test"
   },
   "devDependencies": {
     "@vjscc/eslint-config": "workspace:*",

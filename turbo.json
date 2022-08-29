@@ -7,7 +7,7 @@
     "build": {
       "dependsOn": ["^build"]
     },
-    "lint": {},
-    "dev": {}
+    "test": {},
+    "lint": {}
   }
 }
