@@ -14,7 +14,7 @@ function getPlugins(declaration) {
     resolve(),
     commonjs(),
     ts({
-      transpiler: 'swc',
+      transpiler: 'babel',
       tsconfig: {
         declaration,
         declarationDir: 'dist'

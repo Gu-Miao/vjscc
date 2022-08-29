@@ -127,25 +127,3 @@ export const easeOutBounce = bounceOut
 export function easeInOutBounce(x: number) {
   return x < 0.5 ? (1 - bounceOut(1 - 2 * x)) / 2 : (1 + bounceOut(2 * x - 1)) / 2
 }
-
-/**
- * Use timing function to calculate current value in progress.
- *
- * @param currentTime Current time.
- * @param duration Duration.
- * @param startValue Start value.
- * @param targetValue Target value.
- * @param fn Timing function.
- * @returns Current value.
- */
-export function useTimingFunction(
-  currentTime: number,
-  duration: number,
-  startValue: number,
-  targetValue: number,
-  fn: (x: number) => number = linear
-): number {
-  const progress = currentTime / duration
-  const diff = targetValue - startValue
-  return fn(progress) * diff + startValue
-}

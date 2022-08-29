@@ -1,4 +1,26 @@
-import { useTimingFunction } from './timmingFunctions'
+import { linear } from './easings'
+
+/**
+ * Use timing function to calculate current value in progress.
+ *
+ * @param currentTime Current time.
+ * @param duration Duration.
+ * @param startValue Start value.
+ * @param targetValue Target value.
+ * @param fn Timing function.
+ * @returns Current progress.
+ */
+export function getCurrentProgress(
+  currentTime: number,
+  duration: number,
+  startValue: number,
+  targetValue: number,
+  fn: (x: number) => number = linear
+): number {
+  const progress = currentTime / duration
+  const diff = targetValue - startValue
+  return fn(progress) * diff + startValue
+}
 
 // Basic animation functions options.
 export type AnimationFnOptions = {
@@ -21,27 +43,25 @@ export type FadeFnOptions = AnimationFnOptions & {
  * @param options Options.
  */
 export function fadeOut(el: HTMLElement, options: FadeFnOptions): void {
-  const computedStyle = getComputedStyle(el)
-
-  const {
+  let {
     duration,
     timingFunction,
     callback,
-    startOpacity = computedStyle.opacity ? parseFloat(computedStyle.opacity) : 1,
-    startDisplay = computedStyle.display,
+    startOpacity = parseFloat(getComputedStyle(el).opacity),
+    startDisplay,
     endOpacity = 0,
     endDisplay = 'none'
   } = options
 
   el.style.opacity = startOpacity.toString()
-  el.style.display = startDisplay
+  if (startDisplay !== undefined) el.style.display = startDisplay
 
   const startTime = Date.now()
 
   function fade() {
     const now = Date.now()
     const time = now - startTime
-    const nextOpacity = useTimingFunction(
+    const nextOpacity = getCurrentProgress(
       Math.min(time, duration),
       duration,
       startOpacity,
@@ -70,14 +90,12 @@ export function fadeOut(el: HTMLElement, options: FadeFnOptions): void {
  * @param options Options.
  */
 export function fadeIn(el: HTMLElement, options: FadeFnOptions): void {
-  const computedStyle = getComputedStyle(el)
-
-  const {
+  let {
     duration,
     timingFunction,
     callback,
-    startOpacity = computedStyle.opacity ? parseFloat(computedStyle.opacity) : 0,
-    startDisplay = computedStyle.display,
+    startOpacity = 0,
+    startDisplay = '',
     endOpacity = 1,
     endDisplay = ''
   } = options
@@ -90,7 +108,7 @@ export function fadeIn(el: HTMLElement, options: FadeFnOptions): void {
   function fade() {
     const now = Date.now()
     const time = now - startTime
-    const nextOpacity = useTimingFunction(
+    const nextOpacity = getCurrentProgress(
       Math.min(time, duration),
       duration,
       startOpacity,
