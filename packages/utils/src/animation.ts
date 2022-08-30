@@ -25,7 +25,7 @@ export function getCurrentProgress(
 // Basic animation functions options.
 export type AnimationFnOptions = {
   duration: number
-  timingFunction?: (x: number) => number
+  easing?: (x: number) => number
   callback?: (...args: any[]) => any
 }
 
@@ -45,7 +45,7 @@ export type FadeFnOptions = AnimationFnOptions & {
 export function fadeOut(el: HTMLElement, options: FadeFnOptions): void {
   let {
     duration,
-    timingFunction,
+    easing,
     callback,
     startOpacity = parseFloat(getComputedStyle(el).opacity),
     startDisplay,
@@ -66,7 +66,7 @@ export function fadeOut(el: HTMLElement, options: FadeFnOptions): void {
       duration,
       startOpacity,
       endOpacity,
-      timingFunction
+      easing
     )
 
     el.style.opacity = nextOpacity.toString()
@@ -92,7 +92,7 @@ export function fadeOut(el: HTMLElement, options: FadeFnOptions): void {
 export function fadeIn(el: HTMLElement, options: FadeFnOptions): void {
   let {
     duration,
-    timingFunction,
+    easing,
     callback,
     startOpacity = 0,
     startDisplay = '',
@@ -113,7 +113,7 @@ export function fadeIn(el: HTMLElement, options: FadeFnOptions): void {
       duration,
       startOpacity,
       endOpacity,
-      timingFunction
+      easing
     )
 
     el.style.opacity = nextOpacity.toString()
