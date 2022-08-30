@@ -3,6 +3,8 @@
     "strict": true,
     "esModuleInterop": true,
     "noImplicitAny": true,
-    "lib": ["ESNext", "DOM", "DOM.Iterable"]
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "target": "ESNext",
+    "moduleResolution": "Node"
   }
 }

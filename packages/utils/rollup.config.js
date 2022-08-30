@@ -1,10 +1,9 @@
-import path from 'path'
-import pkg from './package.json'
-
+import path from 'node:path'
 import resolve from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
 import ts from 'rollup-plugin-ts'
 import { terser } from 'rollup-plugin-terser'
+import pkg from './package.json'
 
 const input = path.join(__dirname, 'src/index.ts')
 const name = 'VjsccUtils'
@@ -16,16 +15,13 @@ function getPlugins(declaration) {
     ts({
       transpiler: 'babel',
       tsconfig: {
-        declaration,
-        declarationDir: 'dist'
+        declaration
       }
     })
   ]
 }
 
-/**
- * @type {import('rollup').RollupOptions[]}
- */
+/** @type {import('rollup').RollupOptions[]} */
 const config = [
   {
     input,
@@ -53,7 +49,7 @@ const config = [
     output: {
       name,
       file: 'dist/iife/vjscc-utils.min.js',
-      format: 'iife',
+      format: 'umd',
       exports: 'auto',
       sourcemap: true,
       plugins: [terser()]
