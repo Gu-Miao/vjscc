@@ -9,7 +9,7 @@
     "node": ">=16.9.0"
   },
   "scripts": {
-    "start:utils": "turbo start:utils",
+    "start:utils": "turbo run start:utils",
     "start:modal": "turbo run start:modal",
     "build": "turbo run build",
     "test": "turbo run test"
