@@ -1,208 +1,269 @@
-import { fadeIn, fadeOut, isStringOrHTMLElement, getElement, linear } from '@vjscc/utils'
-
+import { fadeIn, fadeOut, isStringOrHTMLElement, getElement, linear, isNumber } from '@vjscc/utils'
 import './index.less'
 
-type stringOrHTMLElement = string | HTMLElement
-
-let i = 0
-const listenerMap = new Map<string, eventHandler>()
-
-type eventHandler = (this: HTMLElement, ev: MouseEvent) => void
-type handler = (this: VjsccModal, ev: MouseEvent) => void
-
-interface IVjsccModal {
-  id: number
-  isShow: boolean
-  duration: number
-  timingFunction: (x: number) => number
-  maskClose: boolean
-  maskColor?: string
-  $mask: HTMLElement
-  $modal: HTMLElement
-  $header?: HTMLElement
-  $body?: HTMLElement
-  $footer?: HTMLElement
-  $ok?: HTMLElement
-  $cancel?: HTMLElement
-  show: () => VjsccModal
-  hide: () => VjsccModal
-  setOnOK: (fn: handler) => VjsccModal
-  setOnCancel: (fn: handler) => VjsccModal
-}
-
-interface IVjsccModalConstructorOptions {
-  $mask: stringOrHTMLElement
-  isShow?: boolean
-  maskClose?: boolean
-  maskColor?: string
-  onOK?: handler
-  onCancel?: handler
+export type AnimationOptions = {
+  easing?: (x: number) => number
   duration?: number
-  timingFunction?: (x: number) => number
+  in?: (el: HTMLElement, duration: number, easing: (x: number) => number) => any
+  out?: (el: HTMLElement, duration: number, easing: (x: number) => number) => any
 }
 
-interface IDefaultConfig {
-  isShow: boolean
+export type Handler = (this: VjsccModal, e: MouseEvent) => VjsccModal
+
+export type VjsccModalConstructorOptions = {
+  el: string | HTMLElement
+  width?: string | number
+  show?: boolean
+  maskClose?: boolean
+  onConfirm?: Handler
+  onCancel?: Handler
+  animation?: boolean | AnimationOptions
+}
+
+export type ButtonOptions = {
+  text: string
+  props?: Record<string, any>
+  onClick?: Handler
+}
+
+export type VjsccModalUtilOptions = {
+  type: 'default' | 'primary' | 'success' | 'warning' | 'danger'
+  width?: string | number
+  show?: boolean
+  mask?: boolean
+  maskClose?: boolean
+  title?: string | HTMLElement
+  content?: string | HTMLElement
+  footer?: string | HTMLElement | null
+  confirm?: ButtonOptions
+  cancel?: ButtonOptions
+  animation?: boolean | AnimationOptions
+}
+
+const defaultAnimationOptions: Required<AnimationOptions> = {
+  easing: linear,
+  duration: 350,
+  in(el: HTMLElement, duration: number, easing: (x: number) => number) {
+    fadeIn(el, { duration, easing })
+  },
+  out(el: HTMLElement, duration: number, easing: (x: number) => number) {
+    fadeOut(el, { duration, easing })
+  }
+}
+
+/**
+ * Create button element
+ * @param options Options for creating button
+ * @returns HTMLButtonElement
+ */
+function createButton(options: ButtonOptions) {
+  const { text, props = {} } = options
+
+  const $btn = document.createElement('button')
+  $btn.innerHTML = text
+
+  for (const key in props) {
+    $btn.setAttribute(key, props[key])
+  }
+
+  return $btn
+}
+
+class VjsccModal {
   maskClose: boolean
-  maskColor?: string
-  duration: number
-  timingFunction: (x: number) => number
-}
+  $root: HTMLElement
+  $mask: HTMLElement | null
+  $container: HTMLElement
+  $header: HTMLElement | null
+  $body: HTMLElement | null
+  $footer: HTMLElement | null
+  $confirm: HTMLElement | null
+  $cancel: HTMLElement | null
+  #animation?: Required<AnimationOptions>
+  #onConfirm?: (e: MouseEvent) => void
+  #onCancel?: (e: MouseEvent) => void
+  get show() {
+    return getComputedStyle(this.$root).display !== 'none'
+  }
+  set show(show: boolean) {
+    if (this.#animation) {
+      const { duration, easing } = this.#animation
+      const fn = this.#animation[show ? 'in' : 'out']
+      fn(this.$root, duration, easing)
+      return
+    }
+    this.$root.style.display = show ? '' : 'none'
+  }
+  /**
+   * Create modal instance
+   * @param options Options for creating modal instance
+   */
+  constructor(options: VjsccModalConstructorOptions) {
+    let {
+      el,
+      width = 400,
+      show = false,
+      maskClose = false,
+      onConfirm,
+      onCancel,
+      animation
+    } = options
 
-type IConfigArgument = Partial<IDefaultConfig>
-
-let defaultConfig: IDefaultConfig = {
-  isShow: false,
-  maskClose: true,
-  duration: 0.25 * 1000,
-  timingFunction: linear
-}
-
-class VjsccModal implements IVjsccModal {
-  id: number
-  isShow: boolean
-  duration: number
-  timingFunction: (x: number) => number
-  maskClose: boolean
-  maskColor?: string
-  $mask: HTMLElement
-  $modal: HTMLElement
-  $header?: HTMLElement
-  $body?: HTMLElement
-  $footer?: HTMLElement
-  $ok?: HTMLElement
-  $cancel?: HTMLElement
-  constructor(options: IVjsccModalConstructorOptions) {
-    const config = { ...defaultConfig, ...options }
-    const { $mask, isShow, maskClose, maskColor, onOK, onCancel, duration, timingFunction } = config
-
-    if (!isStringOrHTMLElement($mask)) {
-      throw new TypeError(
-        `Initial config 'options.$mask' should be type 'string' or 'HTMLElement'.`
+    if (!isStringOrHTMLElement(el)) {
+      throw new Error(
+        `[@vjscc/modal] 'el' is not a selector string or HTMLElement when constructing.`
       )
     }
-
-    // Find and set $mask.
-    const _$mask = getElement($mask)
-    if (!_$mask) {
-      throw new Error(`Can not get correct element via 'options.$mask', please check out.`)
+    const element = getElement(el)
+    if (!element) {
+      throw new Error(
+        `[@vjscc/modal] Cann't get valid root element via ${el}, checkout your options when constructing.`
+      )
     }
-    this.$mask = _$mask
+    this.$root = element
 
-    // Find and set $modal.
-    const $modal = getElement('.vjscc-modal', this.$mask)
-    if (!$modal) {
-      throw new Error(`Can not get correct element '.vjsc-modal', please check out your HTML.`)
+    this.show = show
+
+    this.$mask = getElement('.vjscc-modal-mask', this.$root)
+    const $container = getElement('.vjscc-modal-container', this.$root)
+    if (!$container) {
+      throw new Error(
+        `[@vjscc/modal] Cann't get valid container element via '.vjscc-modal-mask', checkout your dom structure when constructing.`
+      )
     }
-    this.$modal = $modal
+    this.$container = $container
+    this.$container.style.width = isNumber(width) ? `${width}px` : width
 
-    // Find and set $header.
-    const $header = getElement('.vjscc-modal-header', this.$modal)
-    if ($header) this.$header = $header
+    this.$header = getElement('.vjscc-modal-header', this.$container)
+    this.$body = getElement('.vjscc-modal-body', this.$container)
+    this.$footer = getElement('.vjscc-modal-footer', this.$container)
 
-    // Find and set $body.
-    const $body = getElement('.vjscc-modal-body', this.$modal)
-    if ($body) this.$body = $body
+    this.$confirm = this.$footer ? getElement('.vjscc-modal-confirm', this.$footer) : null
+    this.$cancel = this.$footer ? getElement('.vjscc-modal-cancel', this.$footer) : null
 
-    // Find and set $footer.
-    const $footer = getElement('.vjscc-modal-footer', this.$modal)
-    if ($footer) this.$footer = $footer
-
-    // Find and set $ok.
-    const $ok = getElement('.vjscc-modal-footer-btn-ok', this.$footer)
-    if ($ok) this.$ok = $ok
-
-    // Find and set $cancel.
-    const $cancel = getElement('.vjscc-modal-footer-btn-cancel', this.$cancel)
-    if ($cancel) this.$cancel = $cancel
-
-    this.id = i++
-    this.isShow = isShow
     this.maskClose = maskClose
-
-    if (maskColor) {
-      this.maskColor = maskColor
-      this.$mask.style.backgroundColor = this.maskColor
+    if (this.maskClose && this.$mask) {
+      this.$mask.addEventListener('click', () => (this.show = false))
     }
 
-    // If show dierectly.
-    if (isShow) {
-      this.show()
+    if (animation !== false) {
+      this.#animation = {
+        ...defaultAnimationOptions,
+        ...(typeof animation === 'object' ? animation : {})
+      }
     }
 
-    // Add click event when to close when mask is clicked.
-    if (maskClose) {
-      this.$mask.addEventListener('click', this.hide)
-      this.$modal.addEventListener('click', e => e.stopImmediatePropagation())
-    }
-
-    // Set onOK and onCancel.
-    if (onOK && this.$ok) {
-      this.setOnOK(onOK)
-    }
-    if (this.$cancel) {
-      this.setOnCancel(onCancel ?? this.hide)
-    }
-
-    this.duration = duration
-    this.timingFunction = timingFunction
+    this.setConfirm(onConfirm)
+    this.setCancel(onCancel)
   }
-  static config(config: IConfigArgument): void {
-    defaultConfig = { ...defaultConfig, ...config }
-  }
-  show = (): VjsccModal => {
-    fadeIn(this.$mask, {
-      startDisplay: '',
-      timingFunction: this.timingFunction,
-      duration: this.duration
-    })
-    this.isShow = true
-    return this
-  }
-  hide = (): VjsccModal => {
-    fadeOut(this.$mask, { timingFunction: this.timingFunction, duration: this.duration })
-    this.isShow = false
-    return this
-  }
-  setOnOK = (fn: handler): VjsccModal => {
-    if (!this.$ok) {
-      console.warn(
-        `Can not get correct '$ok' element when set 'onOK()', please checkout your HTML.`
-      )
-      return this
+  /**
+   * Set click handler of confirm button
+   * @param onConfirm Click handler of confirm button
+   */
+  setConfirm(onConfirm?: Handler) {
+    if (!this.$confirm) {
+      console.warn(`[@vjscc/modal] Can't get '$confirm' element when setting 'onConfirm'.`)
+      return
     }
-
-    const id = 'ok_' + this.id
-    const prevHandler = listenerMap.get(id)
-    if (prevHandler) {
-      this.$ok.removeEventListener('click', prevHandler)
-    }
-
-    const handler: eventHandler = (e: MouseEvent) => fn.call(this, e)
-    this.$ok.addEventListener('click', handler)
-    listenerMap.set(id, handler)
-
-    return this
+    if (this.#onConfirm) this.$confirm.removeEventListener('click', this.#onConfirm)
+    this.#onConfirm = onConfirm
+      ? (e: MouseEvent) => {
+          e.stopPropagation()
+          onConfirm.call(this, e)
+        }
+      : (e: MouseEvent) => {
+          e.stopPropagation()
+          this.show = false
+        }
+    this.$confirm.addEventListener('click', this.#onConfirm)
   }
-  setOnCancel = (fn: handler): VjsccModal => {
+  /**
+   * Set click handler of cancel button
+   * @param onCancel Click handler of cancel button
+   */
+  setCancel(onCancel?: Handler) {
     if (!this.$cancel) {
-      console.warn(
-        `Can not get correct '$cancel' element when set 'onCancel()', please checkout your HTML.`
-      )
-      return this
+      console.warn(`[@vjscc/modal] Can't get '$cancel' element when setting 'onCancel'.`)
+      return
+    }
+    if (this.#onCancel) this.$cancel.removeEventListener('click', this.#onCancel)
+    this.#onCancel = onCancel
+      ? (e: MouseEvent) => {
+          e.stopPropagation()
+          onCancel.call(this, e)
+        }
+      : (e: MouseEvent) => {
+          e.stopPropagation()
+          this.show = false
+        }
+    this.$cancel.addEventListener('click', this.#onCancel)
+  }
+  /**
+   *
+   * @param options
+   * @returns
+   */
+  static create(options: VjsccModalUtilOptions) {
+    const {
+      type,
+      width,
+      show,
+      mask,
+      maskClose,
+      title,
+      content,
+      footer,
+      confirm = { text: 'OK' },
+      cancel = { text: 'Cancel' },
+      animation
+    } = options
+
+    const $root = document.createElement('div')
+    $root.classList.add('vjscc-modal-root')
+    if (type !== 'default') $root.classList.add(`vjscc-modal-${type}`)
+    $root.innerHTML = '<div class="vjscc-modal-container">'
+    document.body.append($root)
+
+    const $container = getElement('.vjscc-modal-container', $root) as HTMLDivElement
+
+    if (mask) {
+      const $mask = document.createElement('div')
+      $mask.classList.add('vjscc-modal-mask')
+      $root.prepend($mask)
     }
 
-    const id = 'cancel_' + this.id
-    const prevHandler = listenerMap.get(id)
-    if (prevHandler) {
-      this.$cancel.removeEventListener('click', prevHandler)
+    if (title) {
+      const $header = document.createElement('div')
+      $header.classList.add('vjscc-modal-header')
+      $header.append(title)
+      $container.append($header)
     }
 
-    const handler: eventHandler = (e: MouseEvent) => fn.call(this, e)
-    this.$cancel.addEventListener('click', handler)
-    listenerMap.set(id, handler)
+    const $body = document.createElement('div')
+    $body.classList.add('vjscc-modal-body')
+    if (content) $body.append(content)
+    $container.append($body)
 
-    return this
+    if (footer !== null) {
+      const $footer = document.createElement('div')
+      $footer.classList.add('vjscc-modal-footer')
+      $container.append($footer)
+      if (footer === undefined) {
+        $footer.append(createButton(confirm), createButton(cancel))
+      } else {
+        $footer.append(footer)
+      }
+    }
+
+    return new VjsccModal({
+      el: $root,
+      width,
+      show,
+      maskClose,
+      onConfirm: confirm.onClick,
+      onCancel: cancel.onClick,
+      animation
+    })
   }
 }
 
