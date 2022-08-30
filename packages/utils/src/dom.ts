@@ -41,7 +41,7 @@ export function isStringOrHTMLElement(value: unknown): value is string | HTMLEle
 export function getElement(
   selector: string | HTMLElement,
   container: HTMLElement | Document = document
-) {
+): HTMLElement | null {
   if (isHTMLElement(selector)) {
     return selector as HTMLElement
   }
