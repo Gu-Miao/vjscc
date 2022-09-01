@@ -1,11 +1,13 @@
 import { fadeIn, fadeOut, isStringOrHTMLElement, getElement, linear, isNumber } from '@vjscc/utils'
 import './index.less'
 
+type AnimationHandler = (el: HTMLElement, duration: number, easing: (x: number) => number) => any
+
 export type AnimationOptions = {
   easing?: (x: number) => number
   duration?: number
-  in?: (el: HTMLElement, duration: number, easing: (x: number) => number) => any
-  out?: (el: HTMLElement, duration: number, easing: (x: number) => number) => any
+  in?: AnimationHandler
+  out?: AnimationHandler
 }
 
 export type Handler = (this: VjsccModal, e: MouseEvent) => VjsccModal
@@ -27,11 +29,12 @@ export type ButtonOptions = {
 }
 
 export type VjsccModalUtilOptions = {
-  type: 'default' | 'primary' | 'success' | 'warning' | 'danger'
+  type?: 'default' | 'primary' | 'success' | 'warning' | 'danger'
   width?: string | number
   show?: boolean
   mask?: boolean
   maskClose?: boolean
+  closeIcon?: boolean
   title?: string | HTMLElement
   content?: string | HTMLElement
   footer?: string | HTMLElement | null
@@ -43,10 +46,10 @@ export type VjsccModalUtilOptions = {
 const defaultAnimationOptions: Required<AnimationOptions> = {
   easing: linear,
   duration: 350,
-  in(el: HTMLElement, duration: number, easing: (x: number) => number) {
+  in(el, duration, easing) {
     fadeIn(el, { duration, easing })
   },
-  out(el: HTMLElement, duration: number, easing: (x: number) => number) {
+  out(el, duration, easing) {
     fadeOut(el, { duration, easing })
   }
 }
@@ -69,11 +72,33 @@ function createButton(options: ButtonOptions) {
   return $btn
 }
 
+const activeModals: VjsccModal[] = []
+
+function hideScrollBar() {
+  if (getElement('#vjscc-modal-hide-scroll-bar')) return
+  const style = document.createElement('style')
+  style.innerText = 'html,body{overflow:hidden !important;width:calc(100% - 15px)}'
+  style.id = 'vjscc-modal-hide-scroll-bar'
+  document.head.append(style)
+}
+
+function restoreScrollBar() {
+  const style = getElement('#vjscc-modal-hide-scroll-bar')
+  style?.remove()
+}
+
+window.addEventListener('keyup', e => {
+  if (e.key !== 'Escape' || !activeModals.length) return
+  const last = activeModals.at(-1) as VjsccModal
+  last.show = false
+})
+
 class VjsccModal {
   maskClose: boolean
   $root: HTMLElement
   $mask: HTMLElement | null
   $container: HTMLElement
+  $closeIcon: HTMLElement | null
   $header: HTMLElement | null
   $body: HTMLElement | null
   $footer: HTMLElement | null
@@ -82,12 +107,28 @@ class VjsccModal {
   #animation?: Required<AnimationOptions>
   #onConfirm?: (e: MouseEvent) => void
   #onCancel?: (e: MouseEvent) => void
+  #status: 'creating' | 'show' | 'showing' | 'hide' | 'hidding'
   get show() {
     return getComputedStyle(this.$root).display !== 'none'
   }
   set show(show: boolean) {
+    if (
+      (show && ['show', 'showing'].includes(this.#status)) ||
+      (!show && ['hide', 'hiding'].includes(this.#status))
+    ) {
+      return
+    }
+    if (show) {
+      activeModals.push(this)
+      hideScrollBar()
+    } else {
+      const i = activeModals.findIndex(modal => modal === this)
+      activeModals.splice(i, 1)
+      if (activeModals.length === 0) restoreScrollBar()
+    }
     if (this.#animation) {
       const { duration, easing } = this.#animation
+      this.#status = show ? 'showing' : 'hidding'
       const fn = this.#animation[show ? 'in' : 'out']
       fn(this.$root, duration, easing)
       return
@@ -109,6 +150,8 @@ class VjsccModal {
       animation
     } = options
 
+    this.#status = 'creating'
+
     if (!isStringOrHTMLElement(el)) {
       throw new Error(
         `[@vjscc/modal] 'el' is not a selector string or HTMLElement when constructing.`
@@ -122,8 +165,6 @@ class VjsccModal {
     }
     this.$root = element
 
-    this.show = show
-
     this.$mask = getElement('.vjscc-modal-mask', this.$root)
     const $container = getElement('.vjscc-modal-container', this.$root)
     if (!$container) {
@@ -134,6 +175,16 @@ class VjsccModal {
     this.$container = $container
     this.$container.style.width = isNumber(width) ? `${width}px` : width
 
+    this.$closeIcon = getElement('.vjscc-modal-close', this.$container)
+    if (this.$closeIcon) {
+      this.$closeIcon.innerHTML =
+        '<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path d="m13.41 12l4.3-4.29a1 1 0 1 0-1.42-1.42L12 10.59l-4.29-4.3a1 1 0 0 0-1.42 1.42l4.3 4.29l-4.3 4.29a1 1 0 0 0 0 1.42a1 1 0 0 0 1.42 0l4.29-4.3l4.29 4.3a1 1 0 0 0 1.42 0a1 1 0 0 0 0-1.42Z"/></svg>'
+      this.$closeIcon.addEventListener('click', e => {
+        e.stopPropagation()
+        this.show = false
+      })
+    }
+
     this.$header = getElement('.vjscc-modal-header', this.$container)
     this.$body = getElement('.vjscc-modal-body', this.$container)
     this.$footer = getElement('.vjscc-modal-footer', this.$container)
@@ -143,7 +194,10 @@ class VjsccModal {
 
     this.maskClose = maskClose
     if (this.maskClose && this.$mask) {
-      this.$mask.addEventListener('click', () => (this.show = false))
+      this.$mask.addEventListener('click', e => {
+        e.stopPropagation()
+        this.show = false
+      })
     }
 
     if (animation !== false) {
@@ -155,6 +209,8 @@ class VjsccModal {
 
     this.setConfirm(onConfirm)
     this.setCancel(onCancel)
+
+    this.show = show
   }
   /**
    * Set click handler of confirm button
@@ -205,11 +261,12 @@ class VjsccModal {
    */
   static create(options: VjsccModalUtilOptions) {
     const {
-      type,
+      type = 'default',
       width,
       show,
-      mask,
+      mask = true,
       maskClose,
+      closeIcon = true,
       title,
       content,
       footer,
@@ -232,12 +289,16 @@ class VjsccModal {
       $root.prepend($mask)
     }
 
-    if (title) {
-      const $header = document.createElement('div')
-      $header.classList.add('vjscc-modal-header')
-      $header.append(title)
-      $container.append($header)
+    if (closeIcon) {
+      const $closeIcon = document.createElement('button')
+      $closeIcon.classList.add('vjscc-modal-close')
+      $container.prepend($closeIcon)
     }
+
+    const $header = document.createElement('div')
+    $header.classList.add('vjscc-modal-header')
+    if (title) $header.append(title)
+    $container.append($header)
 
     const $body = document.createElement('div')
     $body.classList.add('vjscc-modal-body')
@@ -249,7 +310,11 @@ class VjsccModal {
       $footer.classList.add('vjscc-modal-footer')
       $container.append($footer)
       if (footer === undefined) {
-        $footer.append(createButton(confirm), createButton(cancel))
+        const $confirm = createButton(confirm)
+        $confirm.classList.add('vjscc-modal-confirm')
+        const $cancel = createButton(cancel)
+        $cancel.classList.add('vjscc-modal-cancel')
+        $footer.append($confirm, $cancel)
       } else {
         $footer.append(footer)
       }

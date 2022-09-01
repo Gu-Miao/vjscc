@@ -6,10 +6,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  pointer-events: none;
   .vjscc-modal-mask {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.2);
+    pointer-events: auto;
   }
   .vjscc-modal-container {
     position: absolute;
@@ -18,9 +20,37 @@
     background: white;
     padding: 0.5em;
     border-radius: 0.4em;
+    box-shadow: 0 0 1em #ccc;
     overflow: hidden;
     max-width: 90%;
     min-width: 16em;
+    pointer-events: auto;
+  }
+  .vjscc-modal-close {
+    position: absolute;
+    z-index: 20220831;
+    top: 1em;
+    right: 1em;
+    display: flex;
+    padding: 0;
+    border: 0;
+    background-color: transparent;
+    font-size: 1.25em;
+    cursor: pointer;
+    svg {
+      fill: #999;
+      transition: fill 0.25s ease-in-out;
+    }
+    &:hover,
+    &:active {
+      svg {
+        fill: #555;
+      }
+    }
+    &:focus-visible {
+      outline-color: #999;
+      outline-width: 2px;
+    }
   }
   .vjscc-modal-header {
     padding: 1em;
@@ -48,24 +78,34 @@
       outline-color: #999;
       outline-width: 2px;
     }
+    &:disabled {
+      cursor: not-allowed;
+    }
   }
   .vjscc-modal-confirm {
     .btn();
     color: white;
     background-color: #6c6cf5;
-    &:active,
-    &:hover {
+    &:not(:disabled):active,
+    &:not(:disabled):hover {
       background-color: darken(#6c6cf5, 10%);
+    }
+    &:disabled {
+      background-color: #eee;
+      color: #999;
     }
   }
   .vjscc-modal-cancel {
     .btn();
     color: inherit;
     background-color: transparent;
-    &:active,
-    &:hover {
+    &:not(:disabled):hover,
+    &:not(:disabled):active {
       color: darken(#6c6cf5, 10%);
       background-color: darken(#f0f0fe, 10%);
+    }
+    &:disabled {
+      color: #999;
     }
   }
 
@@ -74,6 +114,28 @@
       background-color: #f0f0fe;
       color: #6c6cf5;
     }
+    .vjscc-modal-close {
+      svg {
+        fill: darken(#f0f0fe, 15%);
+      }
+      &:active,
+      &:hover {
+        svg {
+          fill: darken(#f0f0fe, 30%);
+        }
+      }
+    }
+    .vjscc-modal-confirm {
+      &:disabled {
+        background-color: darken(#f0f0fe, 5%);
+        color: lighten(#6c6cf5, 15%);
+      }
+    }
+    .vjscc-modal-cancel {
+      &:disabled {
+        color: lighten(#6c6cf5, 15%);
+      }
+    }
   }
 
   &.vjscc-modal-success {
@@ -81,23 +143,39 @@
       background-color: #e1f3d8;
       color: #67c23a;
     }
+    .vjscc-modal-close {
+      svg {
+        fill: darken(#e1f3d8, 25%);
+      }
+      &:active,
+      &:hover {
+        svg {
+          fill: darken(#e1f3d8, 45%);
+        }
+      }
+    }
     .vjscc-modal-confirm {
       color: white;
       background-color: #67c23a;
-      &:active,
-      &:hover,
-      &:focus-visible {
+      &:not(:disabled):active,
+      &:not(:disabled):hover {
         background-color: darken(#67c23a, 10%);
+      }
+      &:disabled {
+        background-color: darken(#e1f3d8, 5%);
+        color: lighten(#67c23a, 15%);
       }
     }
     .vjscc-modal-cancel {
       color: inherit;
       background-color: transparent;
-      &:active,
-      &:hover,
-      &:focus-visible {
+      &:not(:disabled):active,
+      &:not(:disabled):hover {
         color: darken(#67c23a, 10%);
         background-color: darken(#e1f3d8, 10%);
+      }
+      &:disabled {
+        color: lighten(#67c23a, 15%);
       }
     }
   }
@@ -107,23 +185,39 @@
       background-color: #fdf6ec;
       color: #e6a23c;
     }
+    .vjscc-modal-close {
+      svg {
+        fill: darken(#fdf6ec, 25%);
+      }
+      &:hover,
+      &:active {
+        svg {
+          fill: darken(#fdf6ec, 45%);
+        }
+      }
+    }
     .vjscc-modal-confirm {
       color: white;
       background-color: #e6a23c;
-      &:active,
-      &:hover,
-      &:focus-visible {
+      &:not(:disabled):active,
+      &:not(:disabled):hover {
         background-color: darken(#e6a23c, 10%);
+      }
+      &:disabled {
+        background-color: darken(#fdf6ec, 5%);
+        color: lighten(#e6a23c, 10%);
       }
     }
     .vjscc-modal-cancel {
       color: inherit;
       background-color: transparent;
-      &:active,
-      &:hover,
-      &:focus-visible {
+      &:not(:disabled):active,
+      &:not(:disabled):hover {
         color: darken(#e6a23c, 10%);
         background-color: darken(#fdf6ec, 10%);
+      }
+      &:disabled {
+        color: lighten(#e6a23c, 10%);
       }
     }
   }
@@ -133,23 +227,39 @@
       background-color: #fef0f0;
       color: #f56c6c;
     }
+    .vjscc-modal-close {
+      svg {
+        fill: darken(#fef0f0, 15%);
+      }
+      &:hover,
+      &:active {
+        svg {
+          fill: darken(#fef0f0, 30%);
+        }
+      }
+    }
     .vjscc-modal-confirm {
       color: white;
       background-color: #f56c6c;
-      &:active,
-      &:hover,
-      &:focus-visible {
+      &:not(:disabled):active,
+      &:not(:disabled):hover {
         background-color: darken(#f56c6c, 10%);
+      }
+      &:disabled {
+        background-color: darken(#fef0f0, 5%);
+        color: lighten(#f56c6c, 10%);
       }
     }
     .vjscc-modal-cancel {
       color: inherit;
       background-color: transparent;
-      &:active,
-      &:hover,
-      &:focus-visible {
+      &:not(:disabled):active,
+      &:not(:disabled):hover {
         color: darken(#f56c6c, 10%);
         background-color: darken(#fef0f0, 10%);
+      }
+      &:disabled {
+        color: lighten(#f56c6c, 10%);
       }
     }
   }
