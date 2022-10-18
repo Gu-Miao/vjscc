@@ -1,17 +1,21 @@
-.vjscc-modal-root {
-  font-size: 16px;
+.vjscc-modal-no-scrollbar {
+  overflow: hidden !important;
+}
+.vjscc-modal {
   position: fixed;
-  inset: 0;
   z-index: 20220830;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
   display: flex;
   justify-content: center;
   align-items: center;
-  pointer-events: none;
-  .vjscc-modal-mask {
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.2);
-    pointer-events: auto;
+  font-size: 16px;
+  background-color: rgba(0, 0, 0, 0.2);
+  .vjscc-modal-no-mask {
+    pointer-events: none;
+    background-color: none;
   }
   .vjscc-modal-container {
     position: absolute;

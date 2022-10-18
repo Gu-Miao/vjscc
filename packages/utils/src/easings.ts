@@ -1,3 +1,5 @@
+export type Easing = (x: number) => number
+
 const { pow, sqrt, sin, cos, PI } = Math
 const c1 = 1.70158
 const c2 = c1 * 1.525
