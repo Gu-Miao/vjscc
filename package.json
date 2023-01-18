@@ -1,7 +1,6 @@
 {
   "name": "vjscc",
   "private": true,
-  "packageManager": "pnpm@7.12.2",
   "workspaces": [
     "packages/*"
   ],
@@ -9,14 +8,17 @@
     "node": ">=16.9.0"
   },
   "scripts": {
-    "start:utils": "turbo run start:utils",
-    "start:modal": "turbo run start:modal",
-    "build": "turbo run build",
-    "test": "turbo run test"
+    "start:utils": "turbo run start:utils --no-daemon",
+    "start:modal": "turbo run start:modal --no-daemon",
+    "build": "turbo run build --no-daemon",
+    "test": "turbo run test --no-daemon",
+    "lint": "turbo run lint --no-daemon"
   },
   "devDependencies": {
+    "@types/jest": "^29.2.5",
+    "@types/node": "^18.11.18",
     "@vjscc/eslint-config": "workspace:*",
-    "prettier": "^2.7.1",
-    "turbo": "^1.4.3"
+    "prettier": "^2.8.3",
+    "turbo": "^1.7.0"
   }
 }

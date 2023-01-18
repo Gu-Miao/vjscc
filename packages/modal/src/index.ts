@@ -5,13 +5,13 @@ import {
   fadeIn,
   fadeOut,
   linear,
-  Easing
+  Easing,
 } from '@vjscc/utils'
 import './index.less'
 
 export type AnimationAction = (
   el: HTMLElement,
-  options: { duration: number; easing: Easing }
+  options: { duration: number; easing: Easing },
 ) => any
 
 export type AnimationOptions = {
@@ -67,14 +67,14 @@ const defaultOptions: Partial<VjsccModalConstructorOptions> = {
     in: fadeIn,
     out: fadeOut,
     duration: 500,
-    easing: linear
-  }
+    easing: linear,
+  },
 }
 
 const defaultCreateOptions: Partial<VjsccModalCreateOptions> = {
   closeIcon: true,
   confirm: { text: 'OK' },
-  cancel: { text: 'Cancel' }
+  cancel: { text: 'Cancel' },
 }
 
 /** An array to save displayed modals. */
@@ -165,7 +165,7 @@ class VjsccModal {
    * @param options Constructor options.
    */
   constructor(options: VjsccModalConstructorOptions) {
-    let { el, style, width, show, mask, maskClose, escapeClose, animation, onConfirm, onCancel } =
+    const { el, style, width, show, mask, maskClose, escapeClose, animation, onConfirm, onCancel } =
       mergeOptions(defaultOptions, options)
 
     if (!isStringOrHTMLElement(el)) {
@@ -277,7 +277,7 @@ class VjsccModal {
       footer,
       confirm,
       cancel,
-      animation
+      animation,
     } = mergeOptions(defaultCreateOptions, options)
 
     // Root
@@ -345,7 +345,7 @@ class VjsccModal {
       escapeClose,
       onConfirm: (confirm as ButtonOptions).onClick,
       onCancel: (cancel as ButtonOptions).onClick,
-      animation
+      animation,
     })
   }
 }
@@ -368,7 +368,7 @@ function setShow(this: VjsccModal, show: boolean) {
     if (this.animation) {
       this.animation.out(this.$root, {
         duration: this.animation.duration,
-        easing: this.animation.easing
+        easing: this.animation.easing,
       })
     } else {
       this.$root.style.display = 'none'
@@ -386,7 +386,7 @@ function enter(modal: VjsccModal) {
   if (modal.animation) {
     modal.animation.in(modal.$root, {
       duration: modal.animation.duration,
-      easing: modal.animation.easing
+      easing: modal.animation.easing,
     })
   } else {
     modal.$root.style.display = ''
@@ -401,7 +401,7 @@ function enter(modal: VjsccModal) {
  */
 function mergeOptions<T extends Record<string, any>>(defaultOptions: Partial<T>, options: T) {
   const mergedOptions = { ...defaultOptions } as T
-  for (let key in options) {
+  for (const key in options) {
     if (options[key] !== undefined) {
       if (typeof mergedOptions[key] === 'object') {
         mergedOptions[key] = mergeOptions(mergedOptions[key], options[key])

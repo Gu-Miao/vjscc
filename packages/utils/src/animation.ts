@@ -15,7 +15,7 @@ export function getCurrentProgress(
   duration: number,
   startValue: number,
   targetValue: number,
-  fn: (x: number) => number = linear
+  fn: (x: number) => number = linear,
 ): number {
   const progress = currentTime / duration
   const diff = targetValue - startValue
@@ -43,14 +43,14 @@ export type FadeFnOptions = AnimationFnOptions & {
  * @param options Options.
  */
 export function fadeOut(el: HTMLElement, options: FadeFnOptions): void {
-  let {
+  const {
     duration,
     easing,
     callback,
     startOpacity = parseFloat(getComputedStyle(el).opacity),
     startDisplay,
     endOpacity = 0,
-    endDisplay = 'none'
+    endDisplay = 'none',
   } = options
 
   el.style.opacity = startOpacity.toString()
@@ -66,7 +66,7 @@ export function fadeOut(el: HTMLElement, options: FadeFnOptions): void {
       duration,
       startOpacity,
       endOpacity,
-      easing
+      easing,
     )
 
     el.style.opacity = nextOpacity.toString()
@@ -90,14 +90,14 @@ export function fadeOut(el: HTMLElement, options: FadeFnOptions): void {
  * @param options Options.
  */
 export function fadeIn(el: HTMLElement, options: FadeFnOptions): void {
-  let {
+  const {
     duration,
     easing,
     callback,
     startOpacity = 0,
     startDisplay = '',
     endOpacity = 1,
-    endDisplay = ''
+    endDisplay = '',
   } = options
 
   el.style.opacity = startOpacity.toString()
@@ -113,7 +113,7 @@ export function fadeIn(el: HTMLElement, options: FadeFnOptions): void {
       duration,
       startOpacity,
       endOpacity,
-      easing
+      easing,
     )
 
     el.style.opacity = nextOpacity.toString()

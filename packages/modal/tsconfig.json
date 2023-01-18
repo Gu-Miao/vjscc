@@ -1,10 +1,11 @@
 {
   "compilerOptions": {
     "strict": true,
-    "esModuleInterop": true,
     "noImplicitAny": true,
-    "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "target": "ES2015",
-    "moduleResolution": "Node"
-  }
+    "target": "ES5",
+    "removeComments": false,
+    "sourceMap": true
+  },
+  "include": ["src/*.ts"],
+  "exclude": []
 }

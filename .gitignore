@@ -5,7 +5,6 @@ node_modules
 
 # testing
 coverage
-playwright-report
 
 # build
 dist

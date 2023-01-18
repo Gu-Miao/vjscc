@@ -13,12 +13,12 @@ test('fadeOut()', () => {
   document.body.append(node)
 
   Object.defineProperty(window, 'getComputedStyle', {
-    value: () => ({ opacity: '1' })
+    value: () => ({ opacity: '1' }),
   })
 
   fadeOut(node, {
     duration: 2000,
-    startDisplay: 'flex'
+    startDisplay: 'flex',
   })
 
   expect(node.style.opacity).toEqual('1')
@@ -37,11 +37,11 @@ test('fadeOut()', () => {
   node.style.opacity = ''
   node.style.display = ''
 
-  const fn = jest.fn(() => {})
+  const fn = jest.fn(() => void 0)
 
   fadeOut(node, {
     duration: 2000,
-    callback: fn
+    callback: fn,
   })
 
   expect(node.style.display).toEqual('')
@@ -55,7 +55,7 @@ test('fadeIn()', () => {
   document.body.append(node)
 
   fadeIn(node, {
-    duration: 2000
+    duration: 2000,
   })
 
   expect(node.style.opacity).toEqual('0')
@@ -74,11 +74,11 @@ test('fadeIn()', () => {
   node.style.opacity = '0'
   node.style.display = 'none'
 
-  const fn = jest.fn(() => {})
+  const fn = jest.fn(() => void 0)
 
   fadeIn(node, {
     duration: 2000,
-    callback: fn
+    callback: fn,
   })
 
   expect(node.style.display).toEqual('')
