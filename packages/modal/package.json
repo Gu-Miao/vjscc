@@ -8,16 +8,15 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vjscc/vjscc.git"
+    "url": "git+https://github.com/Gu-Miao/vjscc.git"
   },
-  "homepage": "https://github.com/vjscc/vjscc#readme",
+  "homepage": "https://vjscc.gutianhuang.red",
   "bugs": {
-    "url": "https://github.com/vjscc/vjscc/issues"
+    "url": "https://github.com/Gu-Miao/vjscc/issues"
   },
   "files": [
     "package.json",
     "README.md",
-    "README_zh.md",
     "LICENSE",
     "dist"
   ],
