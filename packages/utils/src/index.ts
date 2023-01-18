@@ -1,4 +1,5 @@
 export * from './animation'
+export * from './bom'
 export * from './dom'
 export * from './isPrimitive'
 export * from './easings'
