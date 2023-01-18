@@ -1,0 +1,55 @@
+{
+  "name": "@vjscc/back-top",
+  "version": "1.0.0",
+  "license": "MIT",
+  "keywords": [
+    "vjscc",
+    "back-top"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Gu-Miao/vjscc.git"
+  },
+  "homepage": "https://vjscc.gutianhuang.red",
+  "bugs": {
+    "url": "https://github.com/Gu-Miao/vjscc/issues"
+  },
+  "files": [
+    "package.json",
+    "README.md",
+    "LICENSE",
+    "dist"
+  ],
+  "types": "dist/index.d.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "minified": "dist/index.min.js",
+  "bundle": "dist/index.bundle.js",
+  "scripts": {
+    "serve": "wait-on dist/index.js && live-server --open=e2e --watch=e2e,dist",
+    "start:modal": "concurrently \"rollup -cw --configPlugin typescript\" \"pnpm serve\"",
+    "build": "rimraf dist && rollup -c --configPlugin typescript --environment NODE_ENV:production",
+    "lint": "eslint src --max-warnings 0"
+  },
+  "dependencies": {
+    "@vjscc/utils": "workspace:*"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^24.0.0",
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "@rollup/plugin-terser": "^0.3.0",
+    "@rollup/plugin-typescript": "^11.0.0",
+    "concurrently": "^7.6.0",
+    "less": "^4.1.3",
+    "live-server": "^1.2.2",
+    "rimraf": "^4.1.1",
+    "rollup": "^3.10.0",
+    "rollup-plugin-styles": "^4.0.0",
+    "tslib": "^2.4.1",
+    "typescript": "^4.9.4",
+    "wait-on": "^7.0.1"
+  },
+  "peerDependencies": {
+    "@vjscc/utils": "latest"
+  }
+}
