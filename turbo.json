@@ -5,6 +5,9 @@
     "start:modal": {
       "dependsOn": ["^build"]
     },
+    "start:backTop": {
+      "dependsOn": ["^build"]
+    },
     "build": {
       "dependsOn": ["^build"]
     },

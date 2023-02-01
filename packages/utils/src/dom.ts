@@ -12,13 +12,23 @@ export function isHTMLElement(value: unknown): value is HTMLElement {
 }
 
 /**
+ * Check if value is Document.
+ *
+ * @param value The value to check.
+ * @returns Returns true if value is Document, else false.
+ */
+export function isDocument(value: unknown): value is Document {
+  return value === document
+}
+
+/**
  * Check if value is a HTMLElement or document.
  *
  * @param value The value to check.
  * @returns Returns true if value is a HTMLElement or document, else false.
  */
 export function isHTMLElementOrDocument(value: unknown): value is HTMLElement | Document {
-  return value === document || isHTMLElement(value)
+  return isDocument(value) || isHTMLElement(value)
 }
 
 /**

@@ -27,7 +27,7 @@
   "bundle": "dist/index.bundle.js",
   "scripts": {
     "serve": "wait-on dist/index.js && live-server --open=e2e --watch=e2e,dist",
-    "start:modal": "concurrently \"rollup -cw --configPlugin typescript\" \"pnpm serve\"",
+    "start:backTop": "concurrently \"rollup -cw --configPlugin typescript\" \"pnpm serve\"",
     "build": "rimraf dist && rollup -c --configPlugin typescript --environment NODE_ENV:production",
     "lint": "eslint src --max-warnings 0"
   },

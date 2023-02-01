@@ -10,6 +10,7 @@
   "scripts": {
     "start:utils": "turbo run start:utils --no-daemon",
     "start:modal": "turbo run start:modal --no-daemon",
+    "start:backTop": "turbo run start:backTop --no-daemon",
     "build": "turbo run build --no-daemon",
     "test": "turbo run test --no-daemon",
     "lint": "turbo run lint --no-daemon"
