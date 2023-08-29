@@ -6,5 +6,9 @@ export default defineConfig({
   umd: {
     name: 'VjsccBackTop',
     output: { filename: `vjscc-back-top-${version}.min.` },
+    chainWebpack: memo => {
+      memo.output.libraryExport('default')
+      return memo
+    },
   },
 })

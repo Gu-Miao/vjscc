@@ -5,6 +5,6 @@ export default defineConfig({
   esm: {},
   umd: {
     name: 'VjsccUtils',
-    output: { filename: `vjscc-utils-${version}.min.js` },
+    output: { filename: `vjscc-utils-${version}.min.` },
   },
 })
