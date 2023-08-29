@@ -3,8 +3,7 @@
     "strict": true,
     "noImplicitAny": true,
     "target": "ES5",
-    "removeComments": false,
-    "sourceMap": true
+    "removeComments": false
   },
   "include": ["src/*.ts"],
   "exclude": []

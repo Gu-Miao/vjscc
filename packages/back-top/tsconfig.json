@@ -4,7 +4,8 @@
     "noImplicitAny": true,
     "target": "ES5",
     "removeComments": false,
-    "sourceMap": true
+    "declaration": true,
+    "skipLibCheck": true
   },
   "include": ["src/*.ts"],
   "exclude": []

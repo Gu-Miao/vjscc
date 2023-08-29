@@ -1,10 +1,15 @@
 {
   "name": "@vjscc/back-top",
   "version": "1.0.0",
+  "description": "Vanilla JavaScript back-to-top component",
   "license": "MIT",
+  "author": {
+    "name": "Gu-Miao",
+    "email": "1450206741@qq.com",
+    "url": "https://github.com/Gu-Miao"
+  },
   "keywords": [
-    "vjscc",
-    "back-top"
+    "vjscc"
   ],
   "repository": {
     "type": "git",
@@ -20,36 +25,33 @@
     "LICENSE",
     "dist"
   ],
-  "types": "dist/index.d.ts",
-  "main": "dist/index.js",
-  "module": "dist/index.esm.js",
-  "minified": "dist/index.min.js",
-  "bundle": "dist/index.bundle.js",
-  "scripts": {
-    "serve": "wait-on dist/index.js && live-server --open=e2e --watch=e2e,dist",
-    "start:backTop": "concurrently \"rollup -cw --configPlugin typescript\" \"pnpm serve\"",
-    "build": "rimraf dist && rollup -c --configPlugin typescript --environment NODE_ENV:production",
-    "lint": "eslint src --max-warnings 0"
+  "publishConfig": {
+    "access": "public"
   },
-  "dependencies": {
+  "module": "dist/esm/index.js",
+  "types": "dist/esm/index.d.ts",
+  "sideEffects": "src/index.less",
+  "scripts": {
+    "dev": "father dev",
+    "e2e": "wait-on dist/index.js && live-server --open=e2e --watch=e2e,dist",
+    "start": "concurrently \"pnpm dev\" \"pnpm e2e\"",
+    "build": "rimraf dist && father build",
+    "lint": "eslint src --max-warnings 0 && father doctor"
+  },
+  "peerDependencies": {
     "@vjscc/utils": "workspace:*"
   },
+  "dependencies": {
+    "@babel/runtime": "^7.22.11"
+  },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^24.0.0",
-    "@rollup/plugin-node-resolve": "^15.0.1",
-    "@rollup/plugin-terser": "^0.3.0",
-    "@rollup/plugin-typescript": "^11.0.0",
     "concurrently": "^7.6.0",
+    "father": "^4.3.1",
     "less": "^4.1.3",
     "live-server": "^1.2.2",
     "rimraf": "^4.1.1",
-    "rollup": "^3.10.0",
-    "rollup-plugin-styles": "^4.0.0",
     "tslib": "^2.4.1",
     "typescript": "^4.9.4",
     "wait-on": "^7.0.1"
-  },
-  "peerDependencies": {
-    "@vjscc/utils": "latest"
   }
 }

@@ -78,7 +78,7 @@ export default class VjsccBackTop {
       const scrollTop = getCurrentProgress(time, this.duration, from, y, this.easing)
 
       if (isWindow(this.container)) {
-        window.scrollTo(window.pageXOffset, scrollTop)
+        window.scrollTo(window.scrollX, scrollTop)
       } else if (isDocument(this.container)) {
         document.documentElement.scrollTop = scrollTop
       } else {

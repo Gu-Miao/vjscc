@@ -1,13 +1,16 @@
 {
   "name": "@vjscc/utils",
-  "description": "Vanilla JavaScript utils collection.",
   "version": "1.0.2",
+  "description": "Vanilla JavaScript utils collection.",
   "license": "MIT",
   "author": {
     "name": "Gu-Miao",
     "email": "1450206741@qq.com",
     "url": "https://github.com/Gu-Miao"
   },
+  "keywords": [
+    "vjscc"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Gu-Miao/vjscc.git"
@@ -22,34 +25,35 @@
     "LICENSE",
     "dist"
   ],
-  "types": "dist/index.d.ts",
-  "main": "dist/index.js",
-  "module": "dist/index.esm.js",
-  "minified": "dist/index.min.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "module": "dist/esm/index.js",
+  "types": "dist/esm/index.d.ts",
   "sideEffects": false,
   "scripts": {
-    "start:utils": "jest --watch",
-    "build": "rimraf dist && rollup -c --configPlugin typescript --environment NODE_ENV:production",
+    "start": "jest --watch",
+    "build": "rimraf dist && father build",
     "test": "rimraf coverage && jest",
-    "lint": "eslint src --max-warnings 0"
+    "lint": "eslint src --max-warnings 0 && father doctor"
+  },
+  "peerDependencies": {
+    "lodash-es": "^4.17.21"
   },
   "dependencies": {
-    "@types/lodash-es": "^4.17.6"
+    "@babel/runtime": "^7.22.11"
   },
   "devDependencies": {
     "@babel/core": "^7.18.13",
     "@babel/preset-env": "^7.18.10",
     "@babel/preset-typescript": "^7.18.6",
-    "@rollup/plugin-commonjs": "^24.0.0",
-    "@rollup/plugin-node-resolve": "^15.0.1",
-    "@rollup/plugin-terser": "^0.3.0",
     "@rollup/plugin-typescript": "^11.0.0",
+    "@types/lodash-es": "^4.17.8",
     "babel-jest": "^29.3.1",
+    "father": "^4.3.1",
     "jest": "^29.3.1",
     "jest-environment-jsdom": "^29.3.1",
-    "lodash-es": "^4.17.21",
     "rimraf": "^4.1.1",
-    "rollup": "^3.10.0",
     "typescript": "^4.9.4"
   }
 }
