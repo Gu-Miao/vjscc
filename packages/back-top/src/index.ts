@@ -1,9 +1,9 @@
 import { isWindow, isDocument, getCurrentProgress, easeInCubic, AnyFn, Easing } from '@vjscc/utils'
 import './index.less'
 
-type Container = Window | Document | HTMLElement
+export type Container = Window | Document | HTMLElement
 
-type Options = {
+export type Options = {
   container?: Container
   callback?: AnyFn
   duration?: number
@@ -19,10 +19,6 @@ const defaultOptions: Options = {
   easing: easeInCubic,
 }
 
-let instance: VjsccBackTop | null = null
-let handleClick: AnyFn | null = null
-let handleScroll: AnyFn | null = null
-
 export default class VjsccBackTop {
   container: Container
   btn: HTMLElement
@@ -32,11 +28,6 @@ export default class VjsccBackTop {
   callback?: AnyFn
 
   constructor(options: Options) {
-    if (instance) {
-      instance.destroy()
-      instance = null
-    }
-
     const config = { ...defaultOptions, ...options } as Required<Options>
     this.container = config.container
     this.callback = config.callback
@@ -45,37 +36,21 @@ export default class VjsccBackTop {
     this.visibilityHeight = +config.visibilityHeight
     this.btn = config.btn || createBtn()
 
-    handleClick = () => this.backTop()
-    handleScroll = () => {
-      const scrollTop = getScrollTop(this.container)
-      if (scrollTop < this.visibilityHeight) {
-        this.btn.style.display = 'none'
-      } else {
-        this.btn.style.display = ''
-      }
-    }
+    this.btn.addEventListener('click', this.backTop)
+    this.container.addEventListener('scroll', this.changeButtonVisibility)
 
-    this.btn.addEventListener('click', handleClick)
-    this.container.addEventListener('scroll', handleScroll)
-
-    handleScroll()
-
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    instance = this
+    this.changeButtonVisibility()
   }
 
-  /**
-   * Back to top
-   * @param y Padding of top, default is 0
-   */
-  backTop(y = 0) {
+  /** Back to top */
+  backTop = () => {
     const from = getScrollTop(this.container)
     const startTime = Date.now()
 
     const scroll = () => {
       const now = Date.now()
       const time = now - startTime
-      const scrollTop = getCurrentProgress(time, this.duration, from, y, this.easing)
+      const scrollTop = getCurrentProgress(time, this.duration, from, 0, this.easing)
 
       if (isWindow(this.container)) {
         window.scrollTo(window.scrollX, scrollTop)
@@ -94,12 +69,20 @@ export default class VjsccBackTop {
     requestAnimationFrame(scroll)
   }
 
-  destroy() {
-    this.btn.removeEventListener('click', handleClick as AnyFn)
-    this.container.removeEventListener('scroll', handleScroll as AnyFn)
+  /** Change visibility of button during the scrolling */
+  changeButtonVisibility = () => {
+    const scrollTop = getScrollTop(this.container)
+    if (scrollTop < this.visibilityHeight) {
+      this.btn.style.display = 'none'
+    } else {
+      this.btn.style.display = ''
+    }
+  }
 
-    handleClick = null
-    handleScroll = null
+  /** Destroy the instance */
+  destroy = () => {
+    this.btn.removeEventListener('click', this.backTop)
+    this.container.removeEventListener('scroll', this.changeButtonVisibility)
 
     if (this.btn.classList.contains('vjscc-backtop')) {
       this.btn.remove()
@@ -109,6 +92,7 @@ export default class VjsccBackTop {
       delete this[name]
     }
 
+    /** Cut the prototype chain */
     Object.setPrototypeOf(this, null)
   }
 }
