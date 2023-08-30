@@ -3,8 +3,8 @@ import { defineConfig } from 'father'
 export default defineConfig({
   esm: {},
   umd: {
-    name: 'VjsccBackTop',
-    output: { filename: `vjscc-back-top.min.` },
+    name: 'VjsccModal',
+    output: { filename: `vjscc-modal.min.` },
     chainWebpack: memo => {
       memo.output.libraryExport('default')
       return memo

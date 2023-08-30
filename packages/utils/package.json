@@ -34,6 +34,7 @@
   "scripts": {
     "start": "jest --watch",
     "build": "rimraf dist && father build",
+    "build:utils": "pnpm build",
     "test": "rimraf coverage && jest",
     "lint": "eslint src --max-warnings 0 && father doctor"
   },

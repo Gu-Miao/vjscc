@@ -1,17 +1,19 @@
 {
   "$schema": "https://turborepo.org/schema.json",
   "pipeline": {
-    "start:utils": {},
+    "start:back-top": {
+      "dependsOn": ["build:utils"]
+    },
     "start:modal": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["build:utils"]
     },
-    "start:backTop": {
-      "dependsOn": ["^build"]
-    },
+    "build:utils": {},
     "build": {
       "dependsOn": ["^build"]
     },
-    "test": {},
+    "test": {
+      "dependsOn": ["lint", "build"]
+    },
     "lint": {}
   }
 }

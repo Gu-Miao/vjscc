@@ -32,17 +32,19 @@
   "types": "dist/esm/index.d.ts",
   "sideEffects": "src/index.less",
   "scripts": {
-    "dev": "father dev",
-    "e2e": "wait-on dist/index.js && live-server --open=e2e --watch=e2e,dist",
+    "dev": "rimraf dist && father dev",
+    "e2e": "wait-on dist/esm/index.js && live-server --open=e2e --watch=e2e,dist",
     "start": "concurrently \"pnpm dev\" \"pnpm e2e\"",
+    "start:back-top": "pnpm start",
     "build": "rimraf dist && father build",
     "lint": "eslint src --max-warnings 0 && father doctor"
   },
   "peerDependencies": {
-    "@vjscc/utils": "workspace:*"
+    "@vjscc/utils": "latest"
   },
   "dependencies": {
-    "@babel/runtime": "^7.22.11"
+    "@babel/runtime": "^7.22.11",
+    "@vjscc/utils": "workspace:*"
   },
   "devDependencies": {
     "concurrently": "^7.6.0",
